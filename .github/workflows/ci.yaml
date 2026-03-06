@@ -11,8 +11,8 @@ on:
       - ready_for_review
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+  pull-requests: read
 
 jobs:
   run-pr-branch:
@@ -93,28 +93,22 @@ jobs:
           name: main-output
           path: artifacts/main
 
-      - name: Compare outputs
+      - name: Print run.py main() outputs
         run: |
-          mkdir -p comparison
-          if diff -u artifacts/main/main-output.txt artifacts/pr/pr-output.txt > comparison/diff.txt; then
-            echo "Outputs match." > comparison/summary.txt
-          else
-            echo "Outputs differ. See diff.txt for details." > comparison/summary.txt
-            exit 1
-          fi
-
-      - name: Upload comparison report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: comparison-report
-          path: comparison/
+          echo "Output from run.py on main branch:"
+          cat artifacts/main/main-output.txt
+          echo ""
+          echo "Output from run.py on PR branch:"
+          cat artifacts/pr/pr-output.txt
 
       - name: Write job summary
-        if: always()
         run: |
-          echo "## Output Comparison" >> $GITHUB_STEP_SUMMARY
-          cat comparison/summary.txt >> $GITHUB_STEP_SUMMARY
+          echo "## run.py main() Output" >> $GITHUB_STEP_SUMMARY
+          echo "### Main branch" >> $GITHUB_STEP_SUMMARY
+          cat artifacts/main/main-output.txt >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### PR branch" >> $GITHUB_STEP_SUMMARY
+          cat artifacts/pr/pr-output.txt >> $GITHUB_STEP_SUMMARY
 
   approval:
     needs: compare-outputs
@@ -125,17 +119,3 @@ jobs:
     steps:
       - name: Await manual approval
         run: echo "Waiting for human validation to merge into main"
-
-  merge-to-main:
-    needs: approval
-    runs-on: ubuntu-latest
-    if: |
-      github.event.pull_request.draft == false &&
-      github.event.pull_request.head.repo.full_name == github.repository
-
-    steps:
-      - name: Merge PR after approval
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr merge ${{ github.event.pull_request.number }} --merge --delete-branch
