@@ -12405,3 +12405,58 @@ dag-processor | DAG File Processing Stats
 dag-processor | Bundle       File Path         PID    Current Duration      # DAGs    # Errors  Last Duration    Last Run At
 dag-processor | -----------  ----------------  -----  ------------------  --------  ----------  ---------------  -------------------
 dag-processor | dags-folder  etl_dag.py                                          1           0  0.93s            2026-03-11T18:25:41
+dag-processor | dags-folder  basic_etl_dag.py                                    1           0  0.29s            2026-03-11T18:25:28
+dag-processor | dags-folder  transform_dag.py                                    1           0  0.27s            2026-03-11T18:25:17
+dag-processor | dags-folder  two_task_dag.py                                     1           0  0.12s            2026-03-11T18:25:46
+dag-processor | dags-folder  one_task_dag.py                                     1           0  0.06s            2026-03-11T18:25:19
+dag-processor | dags-folder  load_dag.py                                         1           0  0.04s            2026-03-11T18:25:19
+dag-processor | dags-folder  extract_dag.py                                      1           0  0.03s            2026-03-11T18:25:19
+dag-processor | ================================================================================ [airflow.dag_processing.manager.DagFileProcessorManager] loc=manager.py:822
+dag-processor | 2026-03-11T18:25:49.038123Z [info     ] Sync 1 DAGs                    [airflow.serialization.serialized_objects] loc=serialized_objects.py:2949
+dag-processor | 2026-03-11T18:25:49.043930Z [info     ] Setting next_dagrun for transform_dag to None, run_after=None [airflow.models.dag] loc=dag.py:693
+dag-processor | 2026-03-11T18:25:50.173553Z [info     ] Sync 1 DAGs                    [airflow.serialization.serialized_objects] loc=serialized_objects.py:2949
+dag-processor | 2026-03-11T18:25:50.176444Z [info     ] Setting next_dagrun for load_dag to None, run_after=None [airflow.models.dag] loc=dag.py:693
+dag-processor | 2026-03-11T18:25:50.200676Z [info     ] Sync 1 DAGs                    [airflow.serialization.serialized_objects] loc=serialized_objects.py:2949
+dag-processor | 2026-03-11T18:25:50.212363Z [info     ] Setting next_dagrun for one_task_dag to None, run_after=None [airflow.models.dag] loc=dag.py:693
+dag-processor | 2026-03-11T18:25:50.349010Z [info     ] Sync 1 DAGs                    [airflow.serialization.serialized_objects] loc=serialized_objects.py:2949
+dag-processor | 2026-03-11T18:25:50.350454Z [info     ] Setting next_dagrun for extract_dag to None, run_after=None [airflow.models.dag] loc=dag.py:693
+dag-processor | 2026-03-11T18:25:51.355165Z [info     ] Not time to refresh bundle dags-folder [airflow.dag_processing.manager.DagFileProcessorManager] loc=manager.py:592
+dag-processor | 2026-03-11T18:25:56.371787Z [info     ] Not time to refresh bundle dags-folder [airflow.dag_processing.manager.DagFileProcessorManager] loc=manager.py:592
+dag-processor | 2026-03-11T18:26:00.582532Z [info     ] Sync 1 DAGs                    [airflow.serialization.serialized_objects] loc=serialized_objects.py:2949
+dag-processor | 2026-03-11T18:26:00.587492Z [info     ] Setting next_dagrun for basic_etl_dag to None, run_after=None [airflow.models.dag] loc=dag.py:693
+dag-processor | 2026-03-11T18:26:01.586474Z [info     ] Not time to refresh bundle dags-folder [airflow.dag_processing.manager.DagFileProcessorManager] loc=manager.py:592
+dag-processor | 2026-03-11T18:26:06.602936Z [info     ] Not time to refresh bundle dags-folder [airflow.dag_processing.manager.DagFileProcessorManager] loc=manager.py:592
+dag-processor | 2026-03-11T18:26:11.621830Z [info     ] Not time to refresh bundle dags-folder [airflow.dag_processing.manager.DagFileProcessorManager] loc=manager.py:592
+dag-processor | 2026-03-11T18:26:12.498907Z [info     ] Sync 1 DAGs                    [airflow.serialization.serialized_objects] loc=serialized_objects.py:2949
+dag-processor | 2026-03-11T18:26:12.501153Z [info     ] Setting next_dagrun for etl_dag to None, run_after=None [airflow.models.dag] loc=dag.py:693
+dag-processor | 2026-03-11T18:26:17.510568Z [info     ] Not time to refresh bundle dags-folder [airflow.dag_processing.manager.DagFileProcessorManager] loc=manager.py:592
+dag-processor | 2026-03-11T18:26:17.541931Z [info     ] Sync 1 DAGs                    [airflow.serialization.serialized_objects] loc=serialized_objects.py:2949
+dag-processor | 2026-03-11T18:26:17.543927Z [info     ] Setting next_dagrun for two_task_dag to None, run_after=None [airflow.models.dag] loc=dag.py:693
+dag-processor | 2026-03-11T18:26:18.543434Z [info     ]
+dag-processor | ================================================================================
+dag-processor | DAG File Processing Stats
+dag-processor | Bundle       File Path         PID    Current Duration      # DAGs    # Errors  Last Duration    Last Run At
+dag-processor | -----------  ----------------  -----  ------------------  --------  ----------  ---------------  -------------------
+dag-processor | dags-folder  transform_dag.py                                    1           0  1.34s            2026-03-11T18:25:49
+dag-processor | dags-folder  basic_etl_dag.py                                    1           0  1.20s            2026-03-11T18:26:00
+dag-processor | dags-folder  etl_dag.py                                          1           0  0.87s            2026-03-11T18:26:12
+dag-processor | dags-folder  extract_dag.py                                      1           0  0.16s            2026-03-11T18:25:50
+dag-processor | dags-folder  one_task_dag.py                                     1           0  0.15s            2026-03-11T18:25:50
+dag-processor | dags-folder  load_dag.py                                         1           0  0.13s            2026-03-11T18:25:50
+dag-processor | dags-folder  two_task_dag.py                                     1           0  0.03s            2026-03-11T18:26:17
+dag-processor | ================================================================================ [airflow.dag_processing.manager.DagFileProcessorManager] loc=manager.py:822
+scheduler  | 2026-03-11T18:26:18.804363Z [info     ] Adopting or resetting orphaned tasks for active dag runs [airflow.jobs.scheduler_job_runner.SchedulerJobRunner] loc=scheduler_job_runner.py:2324
+dag-processor | 2026-03-11T18:26:19.757924Z [info     ] Sync 1 DAGs                    [airflow.serialization.serialized_objects] loc=serialized_objects.py:2949
+dag-processor | 2026-03-11T18:26:19.759945Z [info     ] Setting next_dagrun for transform_dag to None, run_after=None [airflow.models.dag] loc=dag.py:693
+dag-processor | 2026-03-11T18:26:20.783190Z [info     ] Sync 1 DAGs                    [airflow.serialization.serialized_objects] loc=serialized_objects.py:2949
+dag-processor | 2026-03-11T18:26:20.785353Z [info     ] Setting next_dagrun for load_dag to None, run_after=None [airflow.models.dag] loc=dag.py:693
+dag-processor | 2026-03-11T18:26:20.799565Z [info     ] Sync 1 DAGs                    [airflow.serialization.serialized_objects] loc=serialized_objects.py:2949
+dag-processor | 2026-03-11T18:26:20.801430Z [info     ] Setting next_dagrun for one_task_dag to None, run_after=None [airflow.models.dag] loc=dag.py:693
+dag-processor | 2026-03-11T18:26:20.813681Z [info     ] Sync 1 DAGs                    [airflow.serialization.serialized_objects] loc=serialized_objects.py:2949
+dag-processor | 2026-03-11T18:26:20.814698Z [info     ] Setting next_dagrun for extract_dag to None, run_after=None [airflow.models.dag] loc=dag.py:693
+dag-processor | 2026-03-11T18:26:22.820577Z [info     ] Not time to refresh bundle dags-folder [airflow.dag_processing.manager.DagFileProcessorManager] loc=manager.py:592
+dag-processor | 2026-03-11T18:26:27.840275Z [info     ] Not time to refresh bundle dags-folder [airflow.dag_processing.manager.DagFileProcessorManager] loc=manager.py:592
+dag-processor | 2026-03-11T18:26:31.099893Z [info     ] Sync 1 DAGs                    [airflow.serialization.serialized_objects] loc=serialized_objects.py:2949
+dag-processor | 2026-03-11T18:26:31.101978Z [info     ] Setting next_dagrun for basic_etl_dag to None, run_after=None [airflow.models.dag] loc=dag.py:693
+dag-processor | 2026-03-11T18:26:33.113406Z [info     ] Not time to refresh bundle dags-folder [airflow.dag_processing.manager.DagFileProcessorManager] loc=manager.py:592
+dag-processor | 2026-03-11T18:26:38.128059Z [info     ] Not time to refresh bundle dags-folder [airflow.dag_processing.manager.DagFileProcessorManager] loc=manager.py:592
