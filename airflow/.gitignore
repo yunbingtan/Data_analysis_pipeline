@@ -1,0 +1,6 @@
+standalone.out
+airflow.db
+airflow.db-shm
+airflow.db-wal
+__pycache__/
+*.pyc
