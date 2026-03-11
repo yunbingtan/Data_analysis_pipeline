@@ -4,6 +4,8 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - "scripts/**/*.py"
     types:
       - opened
       - synchronize
@@ -35,7 +37,7 @@ jobs:
       - name: Run code on PR branch
         run: |
           mkdir -p artifacts
-          python run.py > artifacts/pr-output.txt
+          python scripts/run.py > artifacts/pr-output.txt
 
       - name: Upload PR output
         uses: actions/upload-artifact@v4
@@ -66,7 +68,7 @@ jobs:
       - name: Run code on main branch
         run: |
           mkdir -p artifacts
-          python run.py > artifacts/main-output.txt
+          python scripts/run.py > artifacts/main-output.txt
 
       - name: Upload main output
         uses: actions/upload-artifact@v4
