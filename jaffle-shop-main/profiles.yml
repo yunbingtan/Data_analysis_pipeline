@@ -1,0 +1,15 @@
+default:
+  target: dev
+  outputs:
+    dev:
+      type: sqlite
+      threads: 1
+      database: "ecom" # Value is arbitrary but required by dbt internally
+      schema: 'main' # Must be defined in schemas_and_paths below
+      schemas_and_paths:
+        main: '/workspace/data/main.db' # Database file for dbt models and snapshots
+        # You can add other schema connections here if needed
+      schema_directory: '/workspace/data' # Directory for new .db files
+      # Optional: List of file paths of SQLite extensions to load (e.g., for snapshots)
+      # extensions:
+      #   - "/path/to/sqlean/crypto.so"

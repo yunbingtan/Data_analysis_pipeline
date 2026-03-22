@@ -87,3 +87,19 @@ View rows:
 ```bash
 sqlite3 -header -column data/manual-load-db.db "select * from top_level_domains limit 20;"
 ```
+
+## DBT
+Run dbt deps
+```bash
+./scripts/docker-compose.sh run --rm app dbt deps --project-dir jaffle-shop-main --profiles-dir jaffle-shop-main
+```
+
+Run dbt seed for jaffle-shop-main:
+```bash
+./scripts/docker-compose.sh run --rm app dbt seed --project-dir jaffle-shop-main --profiles-dir jaffle-shop-main --full-refresh --vars '{"load_source_data": true}'
+```
+
+Run dbt build for `jaffle-shop-main`:
+```bash
+./scripts/docker-compose.sh run --rm app dbt build --project-dir jaffle-shop-main --profiles-dir jaffle-shop-main
+```
