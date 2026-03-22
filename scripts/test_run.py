@@ -1,8 +1,8 @@
 import pandas as pd
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-INPUT_FILE = REPO_ROOT / "data" / "output" / "sales_data_sample.csv"
+REPO_ROOT = Path(__file__).resolve().parents[1]
+INPUT_FILE = REPO_ROOT / "data" / "input" / "sales_data_sample.csv"
 
 def main():
     df = pd.read_csv(INPUT_FILE, encoding='cp1252')

@@ -1,0 +1,30 @@
+x-app-base: &app-base
+  build:
+    context: .
+    dockerfile: Dockerfile
+  working_dir: /workspace
+  volumes:
+    - .:/workspace
+  environment:
+    LOCAL_UID: "${LOCAL_UID:-1000}"
+    LOCAL_GID: "${LOCAL_GID:-1000}"
+    AIRFLOW_HOME: /workspace/airflow
+    AIRFLOW_CONFIG: /workspace/airflow/airflow.cfg
+    AIRFLOW__CORE__DAGS_FOLDER: /workspace/airflow/dags
+    AIRFLOW__CORE__PLUGINS_FOLDER: /workspace/airflow/plugins
+    AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+    AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /workspace/airflow/simple_auth_manager_passwords.json.generated
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: sqlite:////workspace/airflow/airflow.db
+    AIRFLOW__LOGGING__BASE_LOG_FOLDER: /workspace/airflow/logs
+    AIRFLOW__LOGGING__DAG_PROCESSOR_CHILD_PROCESS_LOG_DIRECTORY: /workspace/airflow/logs/dag_processor
+    PYTHONPATH: /workspace
+
+services:
+  app:
+    <<: *app-base
+
+  airflow-standalone:
+    <<: *app-base
+    command: ["airflow", "standalone"]
+    ports:
+      - "8080:8080"

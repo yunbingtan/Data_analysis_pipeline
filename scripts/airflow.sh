@@ -14,9 +14,4 @@ export AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE="$AIRFLOW_HOME/simple_a
 
 mkdir -p "$AIRFLOW_HOME/dags" "$AIRFLOW_HOME/plugins"
 
-AIRFLOW_BIN="$REPO_ROOT/.venv/bin/airflow"
-if [[ -x "$AIRFLOW_BIN" ]]; then
-  exec "$AIRFLOW_BIN" "$@"
-fi
-
-exec airflow "$@"
+exec "$REPO_ROOT/scripts/docker-compose.sh" run --build --rm app airflow "$@"
