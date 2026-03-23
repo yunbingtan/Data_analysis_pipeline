@@ -208,3 +208,12 @@
 2026-03-23 17:22:43.041 EDT [9411] LOG:  checkpoint complete: wrote 2791 buffers (17.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 5 recycled; write=269.854 s, sync=0.003 s, total=269.860 s; sync files=151, longest=0.001 s, average=0.001 s; distance=89504 kB, estimate=89504 kB; lsn=0/EA7DE30, redo lsn=0/8CBE170
 2026-03-23 17:23:13.042 EDT [9411] LOG:  checkpoint starting: time
 2026-03-23 17:27:43.007 EDT [9411] LOG:  checkpoint complete: wrote 3658 buffers (22.3%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 8 recycled; write=269.960 s, sync=0.001 s, total=269.966 s; sync files=74, longest=0.001 s, average=0.001 s; distance=128387 kB, estimate=128387 kB; lsn=0/125FDA38, redo lsn=0/10A1F038
+2026-03-23 17:31:18.137 EDT [14550] FATAL:  lock file "postmaster.pid" already exists
+2026-03-23 17:31:18.137 EDT [14550] HINT:  Is another postmaster (PID 9407) running in data directory "/Users/yunbingtan/Data_analysis_pipeline/data/postgres"?
+2026-03-23 17:31:33.536 EDT [9407] LOG:  received fast shutdown request
+2026-03-23 17:31:33.536 EDT [9407] LOG:  aborting any active transactions
+2026-03-23 17:31:33.538 EDT [9407] LOG:  background worker "logical replication launcher" (PID 9416) exited with exit code 1
+2026-03-23 17:31:33.538 EDT [9411] LOG:  shutting down
+2026-03-23 17:31:33.538 EDT [9411] LOG:  checkpoint starting: shutdown immediate
+2026-03-23 17:31:33.560 EDT [9411] LOG:  checkpoint complete: wrote 474 buffers (2.9%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 2 recycled; write=0.020 s, sync=0.002 s, total=0.023 s; sync files=35, longest=0.001 s, average=0.001 s; distance=28538 kB, estimate=118402 kB; lsn=0/125FDAE8, redo lsn=0/125FDAE8
+2026-03-23 17:31:33.571 EDT [9407] LOG:  database system is shut down
