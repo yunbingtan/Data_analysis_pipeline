@@ -3,7 +3,7 @@ with recursive
 calendar as (
     select date('2000-01-01') as date_day
     union all
-    select date(date_day, '+1 day')
+    select (date_day + 1)::date
     from calendar
     where date_day < date('2030-12-31')
 )
