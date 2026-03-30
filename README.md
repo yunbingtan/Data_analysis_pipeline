@@ -103,3 +103,10 @@ Run dbt build for `jaffle-shop-main`:
 ```bash
 ./scripts/docker-compose.sh run --rm app dbt build --project-dir jaffle-shop-main --profiles-dir jaffle-shop-main
 ```
+
+Trigger the repo-local dbt build from Airflow:
+```bash
+./scripts/airflow.sh dags test dbt_build_dag 2024-01-01
+```
+
+Or start Airflow and trigger `dbt_build_dag` from the UI at `http://localhost:8080`.
