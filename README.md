@@ -9,7 +9,7 @@ docker
 docker compose
 ```
 
-Build the image the first time:
+Build the image the first time (or after requirements changes):
 ```bash
 ./scripts/docker-compose.sh build
 ```
@@ -72,20 +72,53 @@ Syntax-check a DAG module in the same containerized environment:
 ./scripts/python.sh -W ignore airflow/dags/one_task_dag.py
 ```
 
-## SQLite
+## PostgreSQL
+PostgreSQL runs on the host machine from `data/postgres`. The Docker containers connect to it through `host.docker.internal`.
+
+Initialize PostgreSQL in the repo:
+```bash
+./scripts/postgres-init.sh
+```
+
+Start PostgreSQL:
+```bash
+./scripts/postgres-start.sh
+```
+
+If PostgreSQL is already initialized under `data/postgres`, just start it:
+```bash
+./scripts/postgres-start.sh
+```
+
+Verify the connection:
+```bash
+psql -U dbt -d ecom -c "SELECT current_database(), current_user;"
+lsof -nP -iTCP:5432 -sTCP:LISTEN
+tail -n 20 data/postgres/server.log
+```
+
+The dbt profile in Docker points at `host.docker.internal:5432`, so once the host PostgreSQL server is running you can use the existing Docker commands for `dbt deps`, `dbt seed`, and `dbt build`.
+
 View DB tables:
 ```bash
-sqlite3 data/manual-load-db.db "select name from sqlite_master where type='table' or type='view';"
+psql -U dbt -d ecom -c "\dt main.*"
+psql -U dbt -d ecom -c "\dv main.*"
+psql -U dbt -d ecom -c "\ds main.*"
 ```
 
 View table schema:
 ```bash
-sqlite3 data/manual-load-db.db ".schema top_level_domains"
+psql -U dbt -d ecom -c "\d main.top_level_domains"
 ```
 
 View rows:
 ```bash
-sqlite3 -header -column data/manual-load-db.db "select * from top_level_domains limit 20;"
+psql -U dbt -d ecom -c "SELECT * FROM main.top_level_domains LIMIT 20;"
+```
+
+Stop the local PostgreSQL server:
+```bash
+./scripts/postgres-stop.sh
 ```
 
 ## DBT
@@ -94,9 +127,14 @@ Run dbt deps
 ./scripts/docker-compose.sh run --rm app dbt deps --project-dir jaffle-shop-main --profiles-dir jaffle-shop-main
 ```
 
+Check the container can reach PostgreSQL:
+```bash
+./scripts/docker-compose.sh run --rm app dbt debug --project-dir jaffle-shop-main --profiles-dir jaffle-shop-main
+```
+
 Run dbt seed for jaffle-shop-main:
 ```bash
-./scripts/docker-compose.sh run --rm app dbt seed --project-dir jaffle-shop-main --profiles-dir jaffle-shop-main --full-refresh --vars '{"load_source_data": true}'
+./scripts/docker-compose.sh run --rm app dbt seed --project-dir jaffle-shop-main --profiles-dir jaffle-shop-main --vars '{"load_source_data": true}'
 ```
 
 Run dbt build for `jaffle-shop-main`:
