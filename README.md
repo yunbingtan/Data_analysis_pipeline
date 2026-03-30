@@ -142,4 +142,9 @@ Run dbt build for `jaffle-shop-main`:
 ./scripts/docker-compose.sh run --rm app dbt build --project-dir jaffle-shop-main --profiles-dir jaffle-shop-main
 ```
 
-**Note**: The project now uses PostgreSQL, allowing Python models (.py files) in addition to SQL models.
+Trigger the repo-local dbt build from Airflow:
+```bash
+./scripts/airflow.sh dags test dbt_build_dag 2024-01-01
+```
+
+Or start Airflow and trigger `dbt_build_dag` from the UI at `http://localhost:8080`.
