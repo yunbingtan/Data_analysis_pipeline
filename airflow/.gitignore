@@ -1,6 +1,2 @@
-standalone.out
-airflow.db
-airflow.db-shm
-airflow.db-wal
-__pycache__/
-simple_auth_manager_passwords.json.generated
+logs/*
+postgres-db-volume/*

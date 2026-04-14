@@ -1,8 +1,0 @@
-comparison-report
-*.zip
-.DS_Store
-.vscode/
-airflow/airflow.db
-airflow/logs/
-airflow/simple_auth_manager_passwords.json.generated
-airflow/standalone.out

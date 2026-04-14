@@ -1,1 +1,0 @@
-/opt/homebrew/Cellar/postgresql@18/18.3/bin/postgres "-D" "/Users/yunbingtan/Data_analysis_pipeline/data/postgres"
