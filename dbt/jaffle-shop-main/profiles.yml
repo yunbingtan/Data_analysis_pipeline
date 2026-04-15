@@ -1,0 +1,12 @@
+default:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      threads: 1
+      host: dbt-postgres
+      port: 5432
+      user: dbt
+      password: dbt_password
+      dbname: ecom
+      schema: main

@@ -1,0 +1,3 @@
+pandas
+numpy
+dbt-postgres==1.9.0
