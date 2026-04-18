@@ -1,9 +1,0 @@
-pandas
-numpy
-graphviz
-# Keep dbt on the 1.10 line for package compatibility while allowing pip
-# to select a compatible dbt-core/dbt-postgres/dbt-adapters patch set.
-dbt-core>=1.10.5,<1.11
-dbt-postgres>=1.10.0,<1.11
-pathspec==0.12.1
-psycopg2-binary

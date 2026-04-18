@@ -3,15 +3,18 @@ from datetime import timedelta, date
 import pendulum
 from pathlib import Path
 import pandas as pd
+import psycopg2
 from airflow import DAG
 from airflow.providers.standard.operators.bash import BashOperator
 from airflow.providers.standard.operators.python import PythonOperator
+from dotenv import load_dotenv
+import os
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+load_dotenv()
+REPO_ROOT = Path(__file__).resolve().parents[1]
 SOURCE_URL = "https://raw.githubusercontent.com/LinkedInLearning/hands-on-introduction-data-engineering-4395021/main/data/constituents.csv"
 INPUT_FILE = REPO_ROOT / 'data' / 'input' / 'sample_constituents.csv'
 OUTPUT_FILE = REPO_ROOT / 'data' / 'output' / 'transformed_sample_constituents.csv'
-DB_FILE = REPO_ROOT / 'data' / 'manual-load-db.db'
 TABLE_NAME = 'constituents'
 
 def transform_data():
@@ -20,6 +23,45 @@ def transform_data():
     df['Date'] = date.today().strftime('%Y-%m-%d')
     OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(OUTPUT_FILE, index=False)
+
+def load_data():
+    df = pd.read_csv(OUTPUT_FILE)
+    
+    conn = psycopg2.connect(
+        host=os.getenv("_DBT_DB_HOST"),
+        port=os.getenv("_DBT_DB_PORT"),
+        dbname=os.getenv("_DBT_DB_NAME"),
+        user=os.getenv("_DBT_DB_USERNAME"),
+        password=os.getenv("_DBT_DB_PASSWORD"),
+        options="-c search_path=test"
+    )
+    
+    with conn.cursor() as cur:
+        # Create table if not exists
+        cur.execute(f"""
+            CREATE TABLE IF NOT EXISTS {TABLE_NAME} (
+                Sector VARCHAR(100),
+                Count INTEGER,
+                Date DATE
+            )
+        """)
+        
+        # Create unique index if not exists
+        cur.execute(f"""
+            CREATE UNIQUE INDEX IF NOT EXISTS ux_constituents_sector 
+            ON {TABLE_NAME}(Sector, Date)
+        """)
+        
+        # Insert data with conflict resolution
+        for _, row in df.iterrows():
+            cur.execute(f"""
+                INSERT INTO {TABLE_NAME} (Sector, Count, Date)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (Sector, Date) DO NOTHING
+            """, (row['Sector'], row['Count'], row['Date']))
+    
+    conn.commit()
+    conn.close()
 
 with DAG(
     dag_id='etl_dag',
@@ -42,7 +84,6 @@ with DAG(
         bash_command=f"""
 set -euo pipefail
 
-mkdir -p "{INPUT_FILE.parent}"
 echo "Extracting data from {INPUT_FILE}..."
 
 curl -fsSL "{SOURCE_URL}" -o "{INPUT_FILE}"
@@ -54,38 +95,9 @@ curl -fsSL "{SOURCE_URL}" -o "{INPUT_FILE}"
         python_callable=transform_data,
     )
 
-    load_task = BashOperator(
+    load_task = PythonOperator(
         task_id='load_data',
-        bash_command=f"""
-set -euo pipefail
-
-mkdir -p "{DB_FILE.parent}"
-
-sqlite3 "{DB_FILE}" <<SQL
-CREATE TABLE IF NOT EXISTS {TABLE_NAME}(
-    Sector VARCHAR(100),
-    Count INTEGER,
-    Date DATE
-);
-CREATE UNIQUE INDEX IF NOT EXISTS ux_constituents_sector ON {TABLE_NAME}(Sector, Date);
-
-DROP TABLE IF EXISTS constituents_staging;
-CREATE TABLE constituents_staging(
-    Sector VARCHAR(100),
-    Count INTEGER,
-    Date DATE
-);
-
-.mode csv
-.import --skip 1 "{OUTPUT_FILE}" constituents_staging
-
-INSERT OR IGNORE INTO {TABLE_NAME} (Sector, Count, Date)
-SELECT Sector, Count, Date
-FROM constituents_staging;
-
-DROP TABLE constituents_staging;
-SQL
-""".strip(),
+        python_callable=load_data,
     )
 
     extract_task >> transform_task >> load_task

@@ -1,12 +1,13 @@
 '''Example DAG I'''
 from datetime import timedelta
 from pathlib import Path
+import os
 import pendulum
 from airflow import DAG
 from airflow.providers.standard.operators.bash import BashOperator
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-OUTPUT_FILE = REPO_ROOT / "data" / "output" / "one_task_dag.txt"
+# The data directory is mounted at /opt/airflow/data, which maps to the repo's data/ directory
+OUTPUT_FILE = Path("/opt/airflow/data/output/one_task_dag.txt")
 
 default_args = {
     'owner': 'airflow',
