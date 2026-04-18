@@ -10,9 +10,10 @@ Run and update the username and password accordingly
 copy .env_copy .env
 ```
 
-[!NOTE] The airflow database username, password, and db name (`_AIRFLOW_DB_USERNAME`, `_AIRFLOW_DB_PASSWORD` and `_AIRFLOW_DB_NAME`) and dbt database username, password, and db name (`_DBT_DB_USERNAME`, `_DBT_DB_PASSWORD`, and `_DBT_DB_NAME`) will be saved in the mounted local folders.
-
-If you want to change them after build:
+> [!CAUTION]
+> The airflow database username, password, and db name (`_AIRFLOW_DB_USERNAME`, `_AIRFLOW_DB_PASSWORD` and `_AIRFLOW_DB_NAME`) and dbt database username, password, and db name (`_DBT_DB_USERNAME`, `_DBT_DB_PASSWORD`, and `_DBT_DB_NAME`) will be saved in the mounted local folders.
+>
+> If you want to change them after build: <br>
 > Option 1: remove everything in the folder and run build again<br>
 > Option 2: change the password in db and update the docker-compose.yaml
 
