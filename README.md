@@ -31,12 +31,22 @@ docker compose up
 docker compose down --volumes --rmi all
 ```
 
-## Container terminal
+## Run container command
 Enter terminal
 ```bash
 docker compose exec <container id or name> bash
 ```
-Exit
+Exit terminal
 ```bash
 exit
+```
+Test dag
+```bash
+docker compose exec airflow-apiserver airflow dags test basic_etl_dag 2026-05-01
+```
+Test dbt
+```bash
+docker compose exec dbt dbt deps
+docker compose exec dbt dbt seed  --vars '{"load_source_data": true}'
+docker compose exec dbt dbt build
 ```

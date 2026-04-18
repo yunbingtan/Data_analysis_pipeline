@@ -74,6 +74,7 @@ x-airflow-common:
     # WARNING: Use _PIP_ADDITIONAL_REQUIREMENTS option ONLY for a quick checks
     # for other purpose (development, test and especially production usage) build/extend Airflow image.
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    DOCKER_HOST: unix:///var/run/docker.sock
     # The following line can be used to set a custom config file, stored in the local config folder
     AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
   volumes:
@@ -81,7 +82,8 @@ x-airflow-common:
     - ${WORKSPACE:-.}/airflow/logs:/opt/airflow/logs
     - ${WORKSPACE:-.}/airflow/config:/opt/airflow/config
     - ${WORKSPACE:-.}/airflow/plugins:/opt/airflow/plugins
-    - ${WORKSPACE:-.}/dbt:/opt/airflow/dbt
+    - ${WORKSPACE:-.}/data:/opt/airflow/data
+    - /var/run/docker.sock:/var/run/docker.sock
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -342,6 +344,7 @@ services:
       POSTGRES_DB: ${_DBT_DB_NAME:-ecom}
     volumes:
       - ${WORKSPACE:-.}/data/dbt-postgres-db:/var/lib/postgresql/data
+      - ${WORKSPACE:-.}/scripts/dbt-init-schemas.sql:/docker-entrypoint-initdb.d/init-schemas.sql
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${_DBT_DB_USERNAME:-dbt}", "-d", "${_DBT_DB_NAME:-ecom}"]
       interval: 10s
@@ -350,16 +353,17 @@ services:
     restart: always
 
   dbt:
+    container_name: ${DBT_CONTAINER_NAME:-dbt}
     image: ghcr.io/dbt-labs/dbt-postgres:1.9.latest
     platform: linux/amd64
     entrypoint: ["/bin/sh", "-c"]
-    working_dir: /usr/app/${DBT_PROJECT_NAME:-jaffle-shop-main}
+    working_dir: /usr/app/${DBT_PROJECT_NAME:-jaffle-shop}
     volumes:
       - ${WORKSPACE:-.}/dbt:/usr/app
     environment:
-      DBT_PROJECT_NAME: ${DBT_PROJECT_NAME:-jaffle-shop-main}
-      DBT_PROJECT_DIR: /usr/app/${DBT_PROJECT_NAME:-jaffle-shop-main}
-      DBT_PROFILES_DIR: /usr/app/${DBT_PROJECT_NAME:-jaffle-shop-main}
+      DBT_PROJECT_NAME: ${DBT_PROJECT_NAME:-jaffle-shop}
+      DBT_PROJECT_DIR: /usr/app/${DBT_PROJECT_NAME:-jaffle-shop}
+      DBT_PROFILES_DIR: /usr/app/${DBT_PROJECT_NAME:-jaffle-shop}
     command: ["tail -f /dev/null"]
     stdin_open: true
     tty: true

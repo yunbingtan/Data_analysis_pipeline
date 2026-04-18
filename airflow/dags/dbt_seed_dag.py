@@ -1,28 +1,11 @@
-"""Airflow DAG to run dbt deps and dbt seed for a selected dbt project."""
+"""Airflow DAG to run dbt deps and dbt seed inside the dbt container."""
 from datetime import timedelta
 import os
-from pathlib import Path
-
 import pendulum
 from airflow import DAG
-from airflow.providers.standard.operators.bash import BashOperator
+from airflow.operators.python import PythonOperator
 
-DBT_PROJECT_NAME = os.getenv("DBT_PROJECT_NAME", "jaffle-shop-main")
-DBT_ROOT_DIR = Path(os.getenv("DBT_ROOT_DIR", "/opt/airflow/dbt"))
-DBT_PROJECT_DIR = Path(
-    os.getenv("DBT_PROJECT_DIR", str(DBT_ROOT_DIR / DBT_PROJECT_NAME))
-)
-DBT_PROFILES_DIR = Path(
-    os.getenv("DBT_PROFILES_DIR", str(DBT_PROJECT_DIR))
-)
-
-DBT_BASE_COMMAND = (
-    'set -euo pipefail\n'
-    'command -v dbt >/dev/null 2>&1\n'
-    f'test -d "{DBT_PROJECT_DIR}"\n'
-    f'test -f "{DBT_PROJECT_DIR / "dbt_project.yml"}"\n'
-    f'test -d "{DBT_PROFILES_DIR}"\n'
-)
+from dbt_container_utils import run_dbt
 
 default_args = {
     "owner": "airflow",
@@ -36,29 +19,33 @@ default_args = {
 
 with DAG(
     dag_id="dbt_seed_dag",
-    description="Run dbt deps and dbt seed for the selected dbt project",
+    description="Run dbt deps and dbt seed inside the dbt container",
     schedule=None,
     catchup=False,
     default_args=default_args,
     tags=["dbt"],
 ) as dag:
-    dbt_deps = BashOperator(
+    def run_deps() -> None:
+        run_dbt("deps")
+
+    dbt_deps = PythonOperator(
         task_id="dbt_deps",
-        bash_command=(
-            DBT_BASE_COMMAND
-            + f'dbt deps --project-dir "{DBT_PROJECT_DIR}" '
-            + f'--profiles-dir "{DBT_PROFILES_DIR}"'
-        ),
+        python_callable=run_deps,
     )
 
-    dbt_seed = BashOperator(
+    def run_seed() -> None:
+        run_dbt(
+            "seed",
+            extra_args=[
+                "--full-refresh",
+                "--vars",
+                '{"load_source_data": true}',
+            ],
+        )
+
+    dbt_seed = PythonOperator(
         task_id="dbt_seed",
-        bash_command=(
-            DBT_BASE_COMMAND
-            + f'dbt seed --project-dir "{DBT_PROJECT_DIR}" '
-            + f'--profiles-dir "{DBT_PROFILES_DIR}" '
-            + '--full-refresh --vars \'{"load_source_data": true}\''
-        ),
+        python_callable=run_seed,
     )
 
     dbt_deps >> dbt_seed

@@ -5,8 +5,8 @@ from airflow import DAG
 from airflow.providers.standard.operators.bash import BashOperator
 import pendulum
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-OUTPUT_FILE = REPO_ROOT / "data" / "output" / "two_task_dag.txt"
+# The data directory is mounted at /opt/airflow/data, which maps to the repo's data/ directory
+OUTPUT_FILE = Path("/opt/airflow/data/output/two_task_dag.txt")
 
 default_args = {
     'owner': 'airflow',
