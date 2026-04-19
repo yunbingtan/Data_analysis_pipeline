@@ -7,7 +7,7 @@ This repo showcases an Airflow-orchestrated data pipeline and a GitHub Actions C
 ## Set up
 Run and update the username and password accordingly
 ```bash
-copy .env_copy .env
+cp .env_copy .env
 ```
 
 > [!CAUTION]
@@ -50,4 +50,9 @@ Test dbt
 docker compose exec dbt dbt deps
 docker compose exec dbt dbt seed  --vars '{"load_source_data": true}'
 docker compose exec dbt dbt build
+```
+Run jupyter notebook in `scripts`
+```bash
+docker compose exec python-analysis jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root
+
 ```

@@ -382,5 +382,14 @@ services:
     environment:
       ADMINER_DEFAULT_SERVER: ${ADMINER_DEFAULT_SERVER:-dbt-postgres}
 
+  python-analysis:
+    build: ./scripts
+    command: ["sleep", "infinity"]
+    working_dir: /analysis
+    ports:
+      - "8888:8888"
+    volumes:
+      - ${WORKSPACE:-.}/scripts:/analysis
+      - ${WORKSPACE:-.}/data:/data
 # volumes:
   # postgres-db-volume:
