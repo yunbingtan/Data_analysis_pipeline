@@ -3,4 +3,4 @@ select
     name as location_name,
     tax_rate,
     cast(opened_at as date) as opened_date
-from {{ source('ecom', 'raw_stores') }}
+from {{ source(env_var('_DBT_DB_NAME'), 'raw_stores') }}

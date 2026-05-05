@@ -2,7 +2,7 @@ with
 
 source as (
 
-    select * from {{ source('ecom', 'raw_products') }}
+    select * from {{ source(env_var('_DBT_DB_NAME'), 'raw_products') }}
 
 ),
 

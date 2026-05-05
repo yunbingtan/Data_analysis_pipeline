@@ -1,0 +1,6 @@
+altair
+pandas
+psycopg[binary]
+SQLAlchemy
+streamlit
+dotenv

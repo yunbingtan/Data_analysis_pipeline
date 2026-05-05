@@ -33,7 +33,7 @@ def load_data():
         dbname=os.getenv("_DBT_DB_NAME"),
         user=os.getenv("_DBT_DB_USERNAME"),
         password=os.getenv("_DBT_DB_PASSWORD"),
-        options="-c search_path=test"
+        options="-c search_path=dev"
     )
     
     with conn.cursor() as cur:

@@ -1,8 +1,8 @@
 version: 2
 
 sources:
-  - name: ecom
-    schema: main
+  - name: "{{ env_var('_DBT_DB_NAME') }}"
+    schema: raw
     description: E-commerce data for the Jaffle Shop
     tables:
       - name: raw_customers

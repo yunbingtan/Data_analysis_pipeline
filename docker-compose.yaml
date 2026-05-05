@@ -97,12 +97,12 @@ services:
     image: postgres:16
     environment:
       POSTGRES_USER: ${_AIRFLOW_DB_USERNAME:-airflow}
-      POSTGRES_PASSWORD: ${_AIRFLOW_DB_PASSWORD:-airflow}
-      POSTGRES_DB: ${_AIRFLOW_DB_NAME:-airflow}
+      POSTGRES_PASSWORD: ${_AIRFLOW_DB_PASSWORD:-airflow_password}
+      POSTGRES_DB: ${_AIRFLOW_DB_NAME:-airflow_db}
     volumes:
-      - ${WORKSPACE:-.}/airflow/postgres-db-volume:/var/lib/postgresql/data
+      - ${WORKSPACE:-.}/airflow/airflow-postgres-db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${_AIRFLOW_DB_USERNAME:-airflow}", "-d", "${_AIRFLOW_DB_NAME:-airflow}"]
+      test: ["CMD", "pg_isready", "-U", "${_AIRFLOW_DB_USERNAME:-airflow}", "-d", "${_AIRFLOW_DB_NAME:-airflow_db}"]
       interval: 10s
       retries: 5
       start_period: 5s
@@ -341,12 +341,12 @@ services:
     environment:
       POSTGRES_USER: ${_DBT_DB_USERNAME:-dbt}
       POSTGRES_PASSWORD: ${_DBT_DB_PASSWORD:-dbt_password}
-      POSTGRES_DB: ${_DBT_DB_NAME:-ecom}
+      POSTGRES_DB: ${_DBT_DB_NAME:-dbt_db}
     volumes:
       - ${WORKSPACE:-.}/data/dbt-postgres-db:/var/lib/postgresql/data
       - ${WORKSPACE:-.}/scripts/dbt-init-schemas.sql:/docker-entrypoint-initdb.d/init-schemas.sql
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${_DBT_DB_USERNAME:-dbt}", "-d", "${_DBT_DB_NAME:-ecom}"]
+      test: ["CMD", "pg_isready", "-U", "${_DBT_DB_USERNAME:-dbt}", "-d", "${_DBT_DB_NAME:-dbt_db}"]
       interval: 10s
       retries: 5
       start_period: 5s
@@ -358,6 +358,8 @@ services:
     platform: linux/amd64
     entrypoint: ["/bin/sh", "-c"]
     working_dir: /usr/app/${DBT_PROJECT_NAME:-jaffle-shop}
+    env_file:
+      - ${ENV_FILE_PATH:-.env}
     volumes:
       - ${WORKSPACE:-.}/dbt:/usr/app
     environment:
@@ -391,5 +393,21 @@ services:
     volumes:
       - ${WORKSPACE:-.}/scripts:/analysis
       - ${WORKSPACE:-.}/data:/data
+  
+  streamlit:
+    build: ./streamlit_app
+    env_file:
+      - ${ENV_FILE_PATH:-.env}
+    environment:
+      DBT_PROJECT_NAME: ${DBT_PROJECT_NAME:-jaffle-shop}
+    ports:
+      - "8501:8501"
+    volumes:
+      - ${WORKSPACE:-.}/streamlit_app:/app
+      - ${WORKSPACE:-.}/data:/data
+    depends_on:
+      dbt-postgres:
+        condition: service_healthy
+    restart: always  
 # volumes:
   # postgres-db-volume:

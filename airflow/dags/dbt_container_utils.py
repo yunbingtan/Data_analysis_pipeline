@@ -4,8 +4,8 @@ from typing import Iterable
 import docker
 from docker.errors import DockerException, NotFound
 
-DBT_CONTAINER_NAME = os.getenv("DBT_CONTAINER_NAME", "dbt")
-DBT_PROJECT_NAME = os.getenv("DBT_PROJECT_NAME", "jaffle-shop")
+DBT_CONTAINER_NAME = os.getenv("DBT_CONTAINER_NAME")
+DBT_PROJECT_NAME = os.getenv("DBT_PROJECT_NAME")
 DBT_PROJECT_DIR = os.getenv(
     "DBT_PROJECT_DIR", f"/usr/app/{DBT_PROJECT_NAME}"
 )

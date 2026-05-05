@@ -4,9 +4,18 @@ default:
     dev:
       type: postgres
       threads: 1
-      host: dbt-postgres
-      port: 5432
-      user: dbt
-      password: dbt_password
-      dbname: ecom
-      schema: main
+      host: "{{ env_var('_DBT_DB_HOST') }}"
+      port: "{{ env_var('_DBT_DB_PORT') | as_number }}"
+      user: "{{ env_var('_DBT_DB_USERNAME') }}"
+      password: "{{ env_var('_DBT_DB_PASSWORD') }}"
+      dbname: "{{ env_var('_DBT_DB_NAME') }}"
+      schema: dev
+    prod:
+      type: postgres
+      threads: 1
+      host: "{{ env_var('_DBT_DB_HOST') }}"
+      port: "{{ env_var('_DBT_DB_PORT') | as_number }}"
+      user: "{{ env_var('_DBT_DB_USERNAME') }}"
+      password: "{{ env_var('_DBT_DB_PASSWORD') }}"
+      dbname: "{{ env_var('_DBT_DB_NAME') }}"
+      schema: prod

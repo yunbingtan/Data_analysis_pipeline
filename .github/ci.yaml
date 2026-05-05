@@ -1,0 +1,154 @@
+name: PR Compare and Gate to Main
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "scripts/*.py"
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  run-pr-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      - name: Prepare environment file
+        run: |
+          cp .env_copy .env
+
+      - name: Build and start python-analysis
+        run: |
+          docker compose up -d --build python-analysis
+
+      - name: Run code on PR branch
+        run: |
+          mkdir -p artifacts
+          mapfile -t changed_py_files < <(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" -- 'scripts/**/*.py' 'scripts/*.py')
+          : > artifacts/pr-output.txt
+          if [ ${#changed_py_files[@]} -eq 0 ]; then
+            echo "No modified Python files found." > artifacts/pr-output.txt
+          else
+            for file in "${changed_py_files[@]}"; do
+              echo "== Running ${file} ==" >> artifacts/pr-output.txt
+              docker compose exec -T python-analysis python "/analysis/${file#scripts/}" >> artifacts/pr-output.txt
+              echo "" >> artifacts/pr-output.txt
+            done
+          fi
+
+      - name: Stop compose services
+        if: always()
+        run: |
+          docker compose down --volumes
+
+      - name: Upload PR output
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-output
+          path: artifacts/pr-output.txt
+
+  run-main-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Prepare environment file
+        run: |
+          cp .env_copy .env
+
+      - name: Build and start python-analysis
+        run: |
+          docker compose up -d --build python-analysis
+
+      - name: Run code on main branch
+        run: |
+          mkdir -p artifacts
+          mapfile -t changed_py_files < <(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" -- 'scripts/**/*.py' 'scripts/*.py')
+          : > artifacts/main-output.txt
+          if [ ${#changed_py_files[@]} -eq 0 ]; then
+            echo "No modified Python files found." > artifacts/main-output.txt
+          else
+            for file in "${changed_py_files[@]}"; do
+              if [ -f "$file" ]; then
+                echo "== Running ${file} ==" >> artifacts/main-output.txt
+                docker compose exec -T python-analysis python "/analysis/${file#scripts/}" >> artifacts/main-output.txt
+                echo "" >> artifacts/main-output.txt
+              else
+                echo "== Skipping ${file} (not present on main) ==" >> artifacts/main-output.txt
+                echo "" >> artifacts/main-output.txt
+              fi
+            done
+          fi
+
+      - name: Stop compose services
+        if: always()
+        run: |
+          docker compose down --volumes
+
+      - name: Upload main output
+        uses: actions/upload-artifact@v4
+        with:
+          name: main-output
+          path: artifacts/main-output.txt
+
+  compare-outputs:
+    needs:
+      - run-pr-branch
+      - run-main-branch
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download PR output
+        uses: actions/download-artifact@v4
+        with:
+          name: pr-output
+          path: artifacts/pr
+
+      - name: Download main output
+        uses: actions/download-artifact@v4
+        with:
+          name: main-output
+          path: artifacts/main
+
+      - name: Print python-analysis outputs
+        run: |
+          echo "Output from python-analysis on main branch:"
+          cat artifacts/main/main-output.txt
+          echo ""
+          echo "Output from python-analysis on PR branch:"
+          cat artifacts/pr/pr-output.txt
+
+      - name: Write job summary
+        run: |
+          echo "## python-analysis Output" >> $GITHUB_STEP_SUMMARY
+          echo "### Main branch" >> $GITHUB_STEP_SUMMARY
+          cat artifacts/main/main-output.txt >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### PR branch" >> $GITHUB_STEP_SUMMARY
+          cat artifacts/pr/pr-output.txt >> $GITHUB_STEP_SUMMARY
+
+  approval:
+    needs: compare-outputs
+    runs-on: ubuntu-latest
+    environment:
+      name: main-merge-approval
+
+    steps:
+      - name: Await manual approval
+        run: echo "Waiting for human validation to merge into main"

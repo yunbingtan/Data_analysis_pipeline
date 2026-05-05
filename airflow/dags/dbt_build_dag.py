@@ -1,6 +1,5 @@
 """Airflow DAG to run dbt deps and dbt build inside the dbt container."""
 from datetime import timedelta
-import os
 import pendulum
 from airflow import DAG
 from airflow.operators.python import PythonOperator
@@ -33,10 +32,22 @@ with DAG(
         python_callable=run_deps,
     )
 
-    def run_build() -> None:
-        run_dbt(
-            "build"
-        )
+    def run_build(**context) -> None:
+        dag_run = context.get("dag_run")
+        conf = dag_run.conf if dag_run else {}
+
+        target = conf.get("target")
+        extra_args = None
+
+        if target is not None:
+            target = str(target).strip().lower()
+            if target not in {"dev", "prod"}:
+                raise ValueError(
+                    f"Unsupported dbt target '{target}'. Use 'dev' or 'prod'."
+                )
+            extra_args = ["--target", target]
+
+        run_dbt("build", extra_args=extra_args)
 
     dbt_build = PythonOperator(
         task_id="dbt_build",
